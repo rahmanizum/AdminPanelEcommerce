@@ -1,6 +1,6 @@
 
 
-//Assigning elements to variables
+//ASSIGN ELEMENTS TO VARIABLE
 const form = document.querySelector(`#my-form`);
 const price = document.getElementById("price");
 const productName = document.getElementById("pname");
@@ -13,7 +13,7 @@ const tablefootData = document.getElementById(`tablefootdata`);
 async function onSubmit(e) {
   e.preventDefault();
 
-  // Creating product object
+  // CREATING OBJECT TO PASS TO SERVER 
   const productdata = {
     productPrice: price.value,
     productName: productName.value,
@@ -21,7 +21,7 @@ async function onSubmit(e) {
   console.log(JSON.stringify(productdata));
 
   try {
-    // Add to server using async/await
+    //ADD TO SERVER 
     const postResponse = await axios.post(
       `https://crudcrud.com/api/7bb295ef39934ecf9eeb2b038b4e1139/productdata`,
       { productdata }
@@ -30,7 +30,7 @@ async function onSubmit(e) {
     console.log(`${postResponse.data.productdata.productName} added`);
     console.log(postResponse);
 
-    // Print on the browser by getting data
+    // FUNCTION TO PRINT DATA ON BROWSER
     const getResponse = await axios.get(
       `https://crudcrud.com/api/7bb295ef39934ecf9eeb2b038b4e1139/productdata`
     );
@@ -47,52 +47,51 @@ async function onSubmit(e) {
 // ON EDITORDELETE FUNCTION 
 async function onEditorDelete(e) {
   e.preventDefault();
-  // get data from button
+  // GET ID FOR PROCESSING
   const btnId = e.target.id;
 
   // WHEN CLICK EDIT BUTTON
   if (e.target && e.target.classList.contains("editbtn")) {
-    console.log(e.target);
-
     try {
-      // Get data from server
+      // GET DATA FFROM SERVER
       const res = await axios.get(
         `https://crudcrud.com/api/7bb295ef39934ecf9eeb2b038b4e1139/productdata/${btnId}`
       );
-
       editing(res);
-      console.log(res);
-      console.log(`${res.data.productdata.productName} ready for editing`);
-
-      // Delete from server
+      // DELETE FROM SERVER
       await axios.delete(
         `https://crudcrud.com/api/7bb295ef39934ecf9eeb2b038b4e1139/productdata/${btnId}`
       );
 
       console.log(`This id : ${btnId}  data deleted`);
 
-      // Delete from browser
+      // DELETE FROM BROWSER
       e.target.parentElement.parentElement.remove();
 
-      // Make ready total for updation
+      // RESET VALUES FOR EDITING 
+      function editing(res){
+        const editProduct = res.data.productdata;
+        price.value= editProduct.productPrice;
+        productName.value = editProduct.productName;
+    }
+      // TOTAL WAITING FOR UPDATION 
       tablefootData.innerHTML = `Total Value worth of products : edit product to fetch total`;
     } catch (err) {
       console.error(err);
     }
   }
 
-  // WHEN CLICK DELETE BUTTON
+// WHEN CLICK DELETE BUTTON
   if (e.target && e.target.classList.contains("delbtn")) {
     try {
-      // Remove from server
+      // REMOVE FROM SERVER
       await axios.delete(
         `https://crudcrud.com/api/7bb295ef39934ecf9eeb2b038b4e1139/productdata/${btnId}`
       );
-
-      console.log(`This id : ${btnId} data deleted`);
-
-      // Remove from browser
+      // REMOVE FROM BROWSER
       e.target.parentElement.parentElement.remove();
+      // TOTAL WAITING FOR REFRESH
+      tablefootData.innerHTML = `Total Value worth of products : refresh to fetch total`;
     } catch (err) {
       console.error(err);
     }
@@ -101,18 +100,18 @@ async function onEditorDelete(e) {
 
 
 // FUNCTION FOR ADDING TO BROWSER
-function showOutput(res){
+function showOutput(res) {
   let totalPrice = 0;
-    console.log(res.data);
-    tableBody.innerHTML=tableBody.children[0].outerHTML;
-    res.data.forEach((ele,index) => {
-      totalPrice+= Number(ele.productdata.productPrice);
-        const tr = document.createElement(`tr`);
-        tr.className = 'nowrap';
-        const val = ele.productdata;
-        const userId = ele._id;
-        const txt = `
-        <td>${index+1}</td>
+  console.log(res.data);
+  tableBody.innerHTML = tableBody.children[0].outerHTML;
+  res.data.forEach((ele, index) => {
+    totalPrice += Number(ele.productdata.productPrice);
+    const tr = document.createElement(`tr`);
+    tr.className = 'nowrap';
+    const val = ele.productdata;
+    const userId = ele._id;
+    const txt = `
+        <td>${index + 1}</td>
         <td>${val.productName}</td>
         <td>${val.productPrice}</td>
         <td>
@@ -126,16 +125,16 @@ function showOutput(res){
             </button>
         </td>
         `;
-        //appending details to table
-        tr.innerHTML+=txt;
-        tableBody.appendChild(tr);   
-    });
+    //appending details to table
+    tr.innerHTML += txt;
+    tableBody.appendChild(tr);
+  });
 
-    //updating the total value worth products 
-tablefootData.innerHTML = `Total Value worth of products : &#8377;${totalPrice}.00`
-        // reinitiate to blank
-        price.value = '';
-        productName.value = '';
+  //updating the total value worth products 
+  tablefootData.innerHTML = `Total Value worth of products : &#8377;${totalPrice}.00`
+  // reinitiate to blank
+  price.value = '';
+  productName.value = '';
 }
 
 // PRINTING DATA WHEN CUSTOMER OPEN WEBSITE
@@ -152,11 +151,9 @@ async function refresh() {
     console.error(err);
   }
 }
-
-// Call the fetchData function when needed
 refresh();
 
-// Event listeners
+// EVENT LISTNERS
 
-submitButton.addEventListener('click',onSubmit);
-tableBody.addEventListener('click',onEditorDelete);
+submitButton.addEventListener('click', onSubmit);
+tableBody.addEventListener('click', onEditorDelete);
