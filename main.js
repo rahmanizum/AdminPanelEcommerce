@@ -18,26 +18,17 @@ async function onSubmit(e) {
     productPrice: price.value,
     productName: productName.value,
   };
-  console.log(JSON.stringify(productdata));
-
   try {
     //ADD TO SERVER 
-    const postResponse = await axios.post(
+    await axios.post(
       `https://crudcrud.com/api/7bb295ef39934ecf9eeb2b038b4e1139/productdata`,
       { productdata }
     );
-
-    console.log(`${postResponse.data.productdata.productName} added`);
-    console.log(postResponse);
-
     // FUNCTION TO PRINT DATA ON BROWSER
     const getResponse = await axios.get(
       `https://crudcrud.com/api/7bb295ef39934ecf9eeb2b038b4e1139/productdata`
     );
-
-    console.log(`data fetched for printing`);
     showOutput(getResponse);
-    console.log(getResponse);
   } catch (err) {
     console.error(err);
   }
@@ -62,12 +53,8 @@ async function onEditorDelete(e) {
       await axios.delete(
         `https://crudcrud.com/api/7bb295ef39934ecf9eeb2b038b4e1139/productdata/${btnId}`
       );
-
-      console.log(`This id : ${btnId}  data deleted`);
-
       // DELETE FROM BROWSER
       e.target.parentElement.parentElement.remove();
-
       // RESET VALUES FOR EDITING 
       function editing(res){
         const editProduct = res.data.productdata;
@@ -102,7 +89,6 @@ async function onEditorDelete(e) {
 // FUNCTION FOR ADDING TO BROWSER
 function showOutput(res) {
   let totalPrice = 0;
-  console.log(res.data);
   tableBody.innerHTML = tableBody.children[0].outerHTML;
   res.data.forEach((ele, index) => {
     totalPrice += Number(ele.productdata.productPrice);
@@ -143,10 +129,7 @@ async function refresh() {
     const res = await axios.get(
       `https://crudcrud.com/api/7bb295ef39934ecf9eeb2b038b4e1139/productdata`
     );
-
-    console.log(`1st time printing`);
     showOutput(res);
-    console.log(res);
   } catch (err) {
     console.error(err);
   }
