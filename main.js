@@ -10,84 +10,95 @@ const tablefootData = document.getElementById(`tablefootdata`);
 
 
 // ON SUBMIT FUNCTION 
-async function onSubmit(e){
-    e.preventDefault();
-//creating person object
-    const productdata = {
-        productPrice: price.value,
-        productName : productName.value ,
-    }
-    console.log(JSON.stringify(productdata));
+async function onSubmit(e) {
+  e.preventDefault();
 
-//add to server 
-await axios.post(`https://crudcrud.com/api/4b781f11bd6f4f4bad1d439db6116eaa/productdata`, { productdata })
-  .then((res) => {
-    console.log(`${res.data.productdata.productName} added`);
-    console.log(res);
-  })
-  .catch((err) => {
+  // Creating product object
+  const productdata = {
+    productPrice: price.value,
+    productName: productName.value,
+  };
+  console.log(JSON.stringify(productdata));
+
+  try {
+    // Add to server using async/await
+    const postResponse = await axios.post(
+      `https://crudcrud.com/api/7bb295ef39934ecf9eeb2b038b4e1139/productdata`,
+      { productdata }
+    );
+
+    console.log(`${postResponse.data.productdata.productName} added`);
+    console.log(postResponse);
+
+    // Print on the browser by getting data
+    const getResponse = await axios.get(
+      `https://crudcrud.com/api/7bb295ef39934ecf9eeb2b038b4e1139/productdata`
+    );
+
+    console.log(`data fetched for printing`);
+    showOutput(getResponse);
+    console.log(getResponse);
+  } catch (err) {
     console.error(err);
-  });
-  //print on browser by get 
-  axios.get(`https://crudcrud.com/api/4b781f11bd6f4f4bad1d439db6116eaa/productdata`)
-  .then((res) => { 
-    console.log(`data feched for printing`);
-    showOutput(res);
-    console.log(res);
-  })
-  .catch((err) => {
-    console.error(err);
-  });
-    
+  }
 }
+
 
 // ON EDITORDELETE FUNCTION 
-function onEditorDelete(e){
-    e.preventDefault();
-    // get data from button
-    const btnId = e.target.id;
-  //WHEN CLICK EDIT BUTTON
-if (e.target && e.target.classList.contains("editbtn")){
+async function onEditorDelete(e) {
+  e.preventDefault();
+  // get data from button
+  const btnId = e.target.id;
+
+  // WHEN CLICK EDIT BUTTON
+  if (e.target && e.target.classList.contains("editbtn")) {
     console.log(e.target);
-//get from server 
-axios
-.get(`https://crudcrud.com/api/4b781f11bd6f4f4bad1d439db6116eaa/productdata/${btnId}`)
-.then(res=>{
-    editing(res);
-    console.log(res);
-    console.log(`${res.data.productdata.productName} ready for editing`);
-})
-.catch(err=>console.error(err));
 
-//delete from server 
-axios
-.delete(`https://crudcrud.com/api/4b781f11bd6f4f4bad1d439db6116eaa/productdata/${btnId}`)
-.then(res=>console.log(`This id : ${btnId}  data deleted`))
-.catch(err=> console.error(err));
+    try {
+      // Get data from server
+      const res = await axios.get(
+        `https://crudcrud.com/api/7bb295ef39934ecf9eeb2b038b4e1139/productdata/${btnId}`
+      );
 
-//delete from browser
-e.target.parentElement.parentElement.remove();
-//replace values for editing 
-function editing(res){
-    const editProduct = res.data.productdata;
-    price.value= editProduct.productPrice;
-    productName.value = editProduct.productName;
-}
-// make ready total for updation 
-tablefootData.innerHTML = `Total Value worth of products : edit product to fetch total`
-}
-// WHEN CLICK DELETE BUTTON 
-if (e.target && e.target.classList.contains("delbtn")){
-//remove from server 
-axios
-.delete(`https://crudcrud.com/api/4b781f11bd6f4f4bad1d439db6116eaa/productdata/${btnId}`)
-.then(res=>console.log(`This id : ${btnId} data deleted`))
-.catch(err=> console.error(err));
-//remove from browser
-e.target.parentElement.parentElement.remove();
+      editing(res);
+      console.log(res);
+      console.log(`${res.data.productdata.productName} ready for editing`);
 
+      // Delete from server
+      await axios.delete(
+        `https://crudcrud.com/api/7bb295ef39934ecf9eeb2b038b4e1139/productdata/${btnId}`
+      );
+
+      console.log(`This id : ${btnId}  data deleted`);
+
+      // Delete from browser
+      e.target.parentElement.parentElement.remove();
+
+      // Make ready total for updation
+      tablefootData.innerHTML = `Total Value worth of products : edit product to fetch total`;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  // WHEN CLICK DELETE BUTTON
+  if (e.target && e.target.classList.contains("delbtn")) {
+    try {
+      // Remove from server
+      await axios.delete(
+        `https://crudcrud.com/api/7bb295ef39934ecf9eeb2b038b4e1139/productdata/${btnId}`
+      );
+
+      console.log(`This id : ${btnId} data deleted`);
+
+      // Remove from browser
+      e.target.parentElement.parentElement.remove();
+    } catch (err) {
+      console.error(err);
+    }
+  }
 }
-}
+
 
 // FUNCTION FOR ADDING TO BROWSER
 function showOutput(res){
@@ -128,16 +139,22 @@ tablefootData.innerHTML = `Total Value worth of products : &#8377;${totalPrice}.
 }
 
 // PRINTING DATA WHEN CUSTOMER OPEN WEBSITE
-axios
-.get(`https://crudcrud.com/api/4b781f11bd6f4f4bad1d439db6116eaa/productdata`)
-.then((res) => { 
-  console.log(`!1 st time printing`);
-  showOutput(res);
-  console.log(res);
-})
-.catch((err) => {
-  console.error(err);
-});
+async function refresh() {
+  try {
+    const res = await axios.get(
+      `https://crudcrud.com/api/7bb295ef39934ecf9eeb2b038b4e1139/productdata`
+    );
+
+    console.log(`1st time printing`);
+    showOutput(res);
+    console.log(res);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// Call the fetchData function when needed
+refresh();
 
 // Event listeners
 
